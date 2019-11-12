@@ -1,25 +1,31 @@
 /* http://jsfiddle.net/jermartin77/63sqmob6/ */
 
-.close {
+.remove-span {
     background: rgb(128, 0, 0);
-    width: 30px;
-    height: 30px;
+    width: 16px;
+    height: 16px;
     position: relative;
 }
-.close:after {
+/* .remove-span:after {
     content: '';
-    height: 30px;
-    border-left: 2px solid #fff;
+    height: 16px;
+    border-left: 2px solid rgb(128, 0, 0);
     position: absolute;
     transform: rotate(45deg);
-    left: 14px;
+    left: 7px;
 }
-
-.close:before {
+.remove-span:before {
     content: '';
-    height: 30px;
-    border-left: 2px solid #fff;
+    height: 16px;
+    border-left: 2px solid rgb(128, 0, 0);
     position: absolute;
     transform: rotate(-45deg);
-    left: 14px;
+    left: 7px;
+} */
+
+.task-span {
+    text-decoration: none;
+}
+.task-span-strikethrough {
+    text-decoration: line-through;
 }

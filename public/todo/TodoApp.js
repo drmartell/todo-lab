@@ -28,7 +28,7 @@ class TodoApp extends Component {
                     const saved = await addTodo(todo);
                     
                     // part 2: integrate back into our list
-                    const { todos } = this.state.todos;
+                    const { todos } = this.state;
                     todos.push(saved);
 
                     // part 3: tell component to update
@@ -109,7 +109,6 @@ class TodoApp extends Component {
         // initial todo load:
         try {
             const todos = await getTodos();
-            console.log(todos);
             this.state.todos = todos;
             todoList.update({ todos });
         }
