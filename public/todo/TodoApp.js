@@ -17,12 +17,105 @@ class TodoApp extends Component {
         const loading = new Loading({ loading: true });
         dom.appendChild(loading.renderDOM());
 
+        const addTodoSection = new AddTodo({
+            onAdd: async todo => {
+                loading.update({ loading: true });
+                // clear prior error
+                error.textContent = '';
+
+                try {
+                    // part 1: do work on the server
+                    const saved = await addTodo(todo);
+                    
+                    // part 2: integrate back into our list
+                    const { todos } = this.state.todos;
+                    todos.push(saved);
+
+                    // part 3: tell component to update
+                    todoList.update({ todos });
+                }
+                catch (err) {
+                    // display error
+                    error.textContent = err;
+                    // rethrow the error so form knows not to clear the input:
+                    throw err;
+                }
+                finally {
+                    loading.update({ loading: false });
+                }
+            }
+        });
+        main.appendChild(addTodoSection.renderDOM());
+
+        const todoList = new TodoList({ 
+            todos: [],
+            onUpdate: async todo => {
+                loading.update({ loading: true });
+                // clear prior error
+                error.textContent = '';
+
+                try {
+                    // part 1: do work on the server
+                    const updated = await updateTodo(todo);
+                    
+                    // part 2: integrate back into our list
+                    const { todos } = this.state;
+                    // find the index of this type:
+                    const index = todos.indexOf(todo);
+                    // replace with updated object from server:
+                    todos.splice(index, 1, updated);
+
+                    // part 3: tell component to update
+                    todoList.update({ todos });
+                }
+                catch (err) {
+                    // display error
+                    console.log(err);
+                }
+                finally {
+                    loading.update({ loading: false });
+                }
+            },
+            onRemove: async todo => {
+                loading.update({ loading: true });
+                // clear prior error
+                error.textContent = '';
+
+                try {
+                    // part 1: do work on the server
+                    await removeTodo(todo.id);
+                    
+                    // part 2: integrate back into our list
+                    const { todos } = this.state;        
+                    // find the index of this type:
+                    const index = todos.indexOf(todo);
+                    // remove from the list
+                    todos.splice(index, 1);
+    
+                    // part 3: tell component to update
+                    todoList.update({ todos });
+                }
+                catch (err) {
+                    // display error
+                    console.log(err);
+                }
+                finally {
+                    loading.update({ loading: false });
+                }
+            }
+        });
+        main.appendChild(todoList.renderDOM());
+
         // initial todo load:
         try {
-            
+            const todos = await getTodos();
+            console.log(todos);
+            this.state.todos = todos;
+            todoList.update({ todos });
         }
         catch (err) {
             // display error...
+            console.log(err);
         }
         finally {
             loading.update({ loading: false });
