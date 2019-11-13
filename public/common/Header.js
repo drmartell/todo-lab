@@ -2,7 +2,7 @@ import Component from '../Component.js';
 
 class Header extends Component {
     renderHTML() {
-        const { title } = this.props || 'Todos';
+        const title = this.props.title || 'Todos';
 
         return /*html*/`
             <header>

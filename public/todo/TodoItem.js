@@ -10,7 +10,7 @@ class TodoItem extends Component {
             onUpdate(todo);
         });
         
-        const removeSpan = dom.querySelector('.remove-span');
+        const removeSpan = dom.querySelector('.close');
         removeSpan.addEventListener('click', () => {
             confirm(`Are you sure you want to remove "${todo.task}"?`) &&
             onRemove(todo);
@@ -24,8 +24,8 @@ class TodoItem extends Component {
             <li>
                 <p>
                     <span class="checkbox"><input type="checkbox" name="checkbox" value="done" ${todo.complete && 'checked'}></span>
-                    <span class="task-span${todo.complete && '-strikethrough'}">Task: ${todo.task}</span>
-                    <span class="remove-span"></span>
+                    <span class="task-span${todo.complete && '-strikethrough'}">${todo.task}</span>
+                    <span class="close">x</span>
                 </p>
             </li>
         `;
