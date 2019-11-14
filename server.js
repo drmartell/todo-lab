@@ -9,6 +9,31 @@ const client = require('./lib/client');
 // Initiate database connection
 client.connect();
 
+// Auth
+const ensureAuth = require('./lib/auth/ensure-auth');
+const createAuthRoutes = require('./lib/auth/create-auth-routes');
+const authRoutes = createAuthRoutes({
+    selectUser(email) {
+        return client.query(`
+            SELECT id, email, hash, display_name as "displayName" 
+            FROM users
+            WHERE email = $1;
+        `,
+        [email]
+        ).then(result => result.rows[0]);
+    },
+    insertUser(user, hash) {
+        console.log(user);
+        return client.query(`
+            INSERT into users (email, hash, display_name)
+            VALUES ($1, $2, $3)
+            RETURNING id, email, display_name as "displayName";
+        `,
+        [user.email, hash, user.displayName]
+        ).then(result => result.rows[0]);
+    }
+});
+
 // Application Setup
 const app = express();
 const PORT = process.env.PORT;
@@ -17,6 +42,12 @@ app.use(cors()); // enable CORS request
 app.use(express.static('public')); // server files from /public folder
 app.use(express.json()); // enable reading incoming json data
 
+// setup authentication routes
+app.use('/api/auth', authRoutes);
+
+// everything that starts with "/api" below here requires an auth token!
+app.use('/api', ensureAuth);
+
 // API Routes
 
 // *** TODOS ***
@@ -24,8 +55,32 @@ app.get('/api/todos', async (req, res) => {
 
     try {
         const result = await client.query(`
-            
-        `);
+            SELECT * FROM todos
+            WHERE user_id = $1
+            ORDER BY complete ASC;
+        `,
+        [req.userId]);
+
+        res.json(result.rows);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: err.message || err
+        });
+    }
+
+});
+
+app.get('/api/lists', async (req, res) => {
+
+    try {
+        const result = await client.query(`
+            SELECT * FROM lists
+            WHERE user_id = $1
+            ORDER BY name ASC;
+        `,
+        [req.userId]);
 
         res.json(result.rows);
     }
@@ -39,14 +94,35 @@ app.get('/api/todos', async (req, res) => {
 });
 
 app.post('/api/todos', async (req, res) => {
-    const todo = req.body;
+    const { listId, task } = req.body;
 
     try {
         const result = await client.query(`
-            
+            INSERT INTO todos (user_id, list_id, task)
+            VALUES ($1, $2, $3)
+            RETURNING *;
         `,
-        [/* pass in data */]);
+        [req.userId, listId, task]);
+        res.json(result.rows[0]);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: err.message || err
+        });
+    }
+});
 
+app.post('/api/lists', async (req, res) => {
+    const { name } = req.body;
+
+    try {
+        const result = await client.query(`
+            INSERT INTO lists (user_id, name)
+            VALUES ($1, $2)
+            RETURNING *;
+        `,
+        [req.userId, name]);
         res.json(result.rows[0]);
     }
     catch (err) {
@@ -59,12 +135,16 @@ app.post('/api/todos', async (req, res) => {
 
 app.put('/api/todos/:id', async (req, res) => {
     const id = req.params.id;
-    const todo = req.body;
+    const { task, complete } = req.body;
 
     try {
         const result = await client.query(`
-            
-        `, [/* pass in data */]);
+        UPDATE todos
+        SET    task = $2,
+               complete = $3
+        WHERE  id = $1
+        RETURNING *;
+        `, [id, task, complete]);
      
         res.json(result.rows[0]);
     }
@@ -78,12 +158,14 @@ app.put('/api/todos/:id', async (req, res) => {
 
 app.delete('/api/todos/:id', async (req, res) => {
     // get the id that was passed in the route:
-    const id = 0; // ???
+    const id = req.params.id;
 
     try {
         const result = await client.query(`
-         
-        `, [/* pass data */]);
+            DELETE FROM todos
+            WHERE  id = $1
+            RETURNING *;
+        `, [id]);
         
         res.json(result.rows[0]);
     }

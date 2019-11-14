@@ -38,7 +38,7 @@ Looks like:
 ```js
 {
     task: 'Thing to do',
-    completed: false
+    complete: false
 }
 ```
 
