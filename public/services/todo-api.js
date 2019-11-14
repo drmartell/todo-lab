@@ -64,6 +64,17 @@ export const addTodo = todo => {
     });
 };
 
+export const addList = list => {
+    const url = `${URL}/lists`;
+    return fetchWithError(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(list)
+    });
+};
+
 export const updateTodo = (todo) => {
     const url = `${URL}/todos/${todo.id}`;
     return fetchWithError(url, {

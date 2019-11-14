@@ -72,8 +72,29 @@ app.get('/api/todos', async (req, res) => {
 
 });
 
+app.get('/api/lists', async (req, res) => {
+
+    try {
+        const result = await client.query(`
+            SELECT * FROM lists
+            WHERE user_id = $1
+            ORDER BY name ASC;
+        `,
+        [req.userId]);
+
+        res.json(result.rows);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: err.message || err
+        });
+    }
+
+});
+
 app.post('/api/todos', async (req, res) => {
-    const { userId, listId, task } = req.body;
+    const { listId, task } = req.body;
 
     try {
         const result = await client.query(`
@@ -82,6 +103,26 @@ app.post('/api/todos', async (req, res) => {
             RETURNING *;
         `,
         [req.userId, listId, task]);
+        res.json(result.rows[0]);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: err.message || err
+        });
+    }
+});
+
+app.post('/api/lists', async (req, res) => {
+    const { name } = req.body;
+
+    try {
+        const result = await client.query(`
+            INSERT INTO lists (user_id, name)
+            VALUES ($1, $2)
+            RETURNING *;
+        `,
+        [req.userId, name]);
         res.json(result.rows[0]);
     }
     catch (err) {

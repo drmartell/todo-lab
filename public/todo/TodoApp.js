@@ -17,35 +17,35 @@ class TodoApp extends Component {
         const loading = new Loading({ loading: true });
         dom.appendChild(loading.renderDOM());
 
-        const addListSection = new AddList({
-            onAddList: async todo => {
-                loading.update({ loading: true });
-                // clear prior error
-                error.textContent = '';
+        // const addListSection = new AddList({
+        //     onAddList: async todo => {
+        //         loading.update({ loading: true });
+        //         // clear prior error
+        //         error.textContent = '';
 
-                try {
-                    // part 1: do work on the server
-                    const saved = await addList(todo);
+        //         try {
+        //             // part 1: do work on the server
+        //             const saved = await addList(todo);
                     
-                    // part 2: integrate back into our list
-                    const { todos } = this.state;
-                    todos.push(saved);
+        //             // part 2: integrate back into our list
+        //             const { todos } = this.state;
+        //             todos.push(saved);
 
-                    // part 3: tell component to update
-                    todoList.update({ todos });
-                }
-                catch (err) {
-                    // display error
-                    error.textContent = err;
-                    // rethrow the error so form knows not to clear the input:
-                    throw err;
-                }
-                finally {
-                    loading.update({ loading: false });
-                }
-            }
-        });
-        main.appendChild(addListSection.renderDOM());
+        //             // part 3: tell component to update
+        //             todoList.update({ todos });
+        //         }
+        //         catch (err) {
+        //             // display error
+        //             error.textContent = err;
+        //             // rethrow the error so form knows not to clear the input:
+        //             throw err;
+        //         }
+        //         finally {
+        //             loading.update({ loading: false });
+        //         }
+        //     }
+        // });
+        // main.appendChild(addListSection.renderDOM());
 
         const addTodoSection = new AddTodo({
             onAdd: async todo => {
