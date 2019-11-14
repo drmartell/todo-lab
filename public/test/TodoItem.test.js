@@ -8,7 +8,9 @@ test('renders html from data', assert => {
     const todo = {
         id: 3,
         task: 'Tested Design',
-        complete: true
+        complete: true,
+        userId: 1,
+        listId: 1,
     };
 
     const expected = /*html*/`

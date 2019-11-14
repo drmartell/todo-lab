@@ -11,16 +11,16 @@ async function run() {
         await client.connect();
 
         await client.query(`
-                    INSERT INTO users (email, hash)
-                    VALUES ($1, $2);
+                    INSERT INTO users (email, hash, display_name)
+                    VALUES ($1, $2, $3);
                 `,
-        [user.email, user.hash]);
+        [user.email, user.hash, user.displayName]);
 
         await client.query(`
                     INSERT INTO lists (user_id, name)
                     VALUES ($1, $2);
                 `,
-        [list.user_id, list.name]);  
+        [list.userId, list.name]);  
 
         await Promise.all(
             todos.map(todo => {
@@ -28,7 +28,7 @@ async function run() {
                     INSERT INTO todos (task, user_id, list_id, complete)
                     VALUES ($1, $2, $3, $4);
                 `,
-                [todo.task, todo.user_id, todo.list_id, todo.complete]);
+                [todo.task, todo.userId, todo.listId, todo.complete]);
             })
         );
 

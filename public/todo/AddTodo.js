@@ -3,7 +3,7 @@ import Component from '../Component.js';
 class AddTodo extends Component {
 
     onRender(form) {
-        const { onAdd } = this.props;
+        const { onAdd, listId } = this.props;
         const input = form.querySelector('input[name=new-todo]');
         
         form.addEventListener('submit', async event => {
@@ -11,6 +11,7 @@ class AddTodo extends Component {
 
             const newTodo = {
                 task: input.value,
+                listId: listId,
             };
 
             try {
