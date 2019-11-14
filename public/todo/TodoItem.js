@@ -19,7 +19,6 @@ class TodoItem extends Component {
 
     renderHTML() {
         const { todo } = this.props;
-
         return /*html*/`
             <li>
                 <p>
